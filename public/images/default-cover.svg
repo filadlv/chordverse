@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+<rect width="600" height="600" fill="#ede9fe"/>
+<circle cx="300" cy="270" r="120" fill="#7c3aed" opacity=".15"/>
+<path d="M350 170v205c0 42-32 72-74 72-38 0-67-24-67-56 0-34 31-58 72-58 18 0 34 4 47 12V170h22z" fill="#7c3aed"/>
+<text x="300" y="500" text-anchor="middle" font-family="Arial" font-size="42" font-weight="700" fill="#111827">ChordVerse</text>
+</svg>
