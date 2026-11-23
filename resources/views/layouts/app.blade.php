@@ -95,13 +95,36 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+function copyChordFallback(text, done) {
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.style.position = 'fixed';
+    area.style.top = '-1000px';
+    document.body.appendChild(area);
+    area.select();
+    try { document.execCommand('copy'); done(); } catch (e) { alert('Chord gagal disalin. Blok teks chord lalu salin manual.'); }
+    document.body.removeChild(area);
+}
+
 function copyChord() {
-    const text = document.getElementById('chordText').innerText;
-    navigator.clipboard.writeText(text).then(() => {
-        const btn = document.getElementById('copyBtn');
+    const el = document.getElementById('chordText');
+    const btn = document.getElementById('copyBtn');
+    if (!el || !btn) return;
+
+    const text = el.innerText;
+    const done = () => {
         btn.innerText = 'Tersalin ✓';
         setTimeout(() => btn.innerText = 'Copy Chord', 1500);
-    });
+    };
+
+    // navigator.clipboard hanya tersedia pada HTTPS atau localhost,
+    // jadi http://chordverse.test memakai fallback di bawah.
+    if (window.isSecureContext && navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(done).catch(() => copyChordFallback(text, done));
+    } else {
+        copyChordFallback(text, done);
+    }
 }
 </script>
 </body>
