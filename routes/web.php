@@ -14,6 +14,20 @@ Route::get('/search', [SongController::class, 'search'])->name('songs.search');
 
 Route::get('/genre/{genre:slug}', [GenreController::class, 'show'])->name('genres.show');
 
+/*
+| CRUD chord (khusus user login).
+| Wajib didaftarkan SEBELUM /songs/{song} agar /songs/create tidak
+| tertangkap sebagai parameter {song}.
+*/
+Route::middleware('auth')->group(function () {
+    Route::get('/songs/create', [SongController::class, 'create'])->name('songs.create');
+    Route::post('/songs', [SongController::class, 'store'])->name('songs.store');
+
+    Route::get('/songs/{song}/edit', [SongController::class, 'edit'])->name('songs.edit');
+    Route::match(['put', 'patch'], '/songs/{song}', [SongController::class, 'update'])->name('songs.update');
+    Route::delete('/songs/{song}', [SongController::class, 'destroy'])->name('songs.destroy');
+});
+
 Route::get('/songs/{song}', [SongController::class, 'show'])->name('songs.show');
 
 Route::middleware('guest')->group(function () {
@@ -26,13 +40,6 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-    Route::get('/songs/create', [SongController::class, 'create'])->name('songs.create');
-    Route::post('/songs', [SongController::class, 'store'])->name('songs.store');
-
-    Route::get('/songs/{song}/edit', [SongController::class, 'edit'])->name('songs.edit');
-    Route::put('/songs/{song}', [SongController::class, 'update'])->name('songs.update');
-    Route::delete('/songs/{song}', [SongController::class, 'destroy'])->name('songs.destroy');
 
     Route::post('/songs/{song}/bookmark', [BookmarkController::class, 'toggle'])->name('bookmarks.toggle');
 

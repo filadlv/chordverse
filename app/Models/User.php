@@ -43,6 +43,14 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    /**
+     * Alias eksplisit untuk daftar lagu yang di-bookmark pengguna.
+     */
+    public function bookmarkedSongs()
+    {
+        return $this->bookmarks();
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';

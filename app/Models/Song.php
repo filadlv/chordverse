@@ -36,10 +36,21 @@ class Song extends Model
         return $this->belongsTo(Genre::class);
     }
 
-    public function bookmarkedBy()
+    /**
+     * Pengguna yang menyimpan lagu ini sebagai bookmark.
+     */
+    public function bookmarks()
     {
         return $this->belongsToMany(User::class, 'bookmarks')
             ->withTimestamps();
+    }
+
+    /**
+     * Alias lama, dipertahankan agar kode tim yang sudah memakainya tetap jalan.
+     */
+    public function bookmarkedBy()
+    {
+        return $this->bookmarks();
     }
 
     public function isBookmarkedBy(?User $user): bool

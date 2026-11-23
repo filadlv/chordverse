@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\SongRequest;
+use App\Http\Requests\StoreSongRequest;
+use App\Http\Requests\UpdateSongRequest;
 use App\Models\Genre;
 use App\Models\Song;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -29,13 +31,15 @@ class SongController extends Controller
         return view('songs.search', compact('songs', 'keyword'));
     }
 
+    /**
+     * Halaman detail chord: dapat dibuka semua pengunjung dan
+     * menambah jumlah dilihat satu kali setiap kali dibuka.
+     */
     public function show(Song $song): View
     {
-        $song->load(['genre', 'user']);
-
         $song->increment('views');
 
-        $song->refresh();
+        $song->load(['user', 'genre']);
 
         return view('songs.show', compact('song'));
     }
@@ -47,7 +51,7 @@ class SongController extends Controller
         return view('songs.create', compact('genres'));
     }
 
-    public function store(SongRequest $request)
+    public function store(StoreSongRequest $request): RedirectResponse
     {
         $data = $request->validated();
         $data['user_id'] = $request->user()->id;
@@ -56,9 +60,11 @@ class SongController extends Controller
             $data['cover'] = $request->file('cover')->store('covers', 'public');
         }
 
-        Song::create($data);
+        $song = Song::create($data);
 
-        return redirect()->route('profile')->with('success', 'Chord berhasil ditambahkan.');
+        return redirect()
+            ->route('songs.show', $song)
+            ->with('success', 'Chord berhasil ditambahkan.');
     }
 
     public function edit(Song $song): View
@@ -70,7 +76,7 @@ class SongController extends Controller
         return view('songs.edit', compact('song', 'genres'));
     }
 
-    public function update(SongRequest $request, Song $song)
+    public function update(UpdateSongRequest $request, Song $song): RedirectResponse
     {
         $this->authorize('update', $song);
 
@@ -86,10 +92,12 @@ class SongController extends Controller
 
         $song->update($data);
 
-        return redirect()->route('songs.show', $song)->with('success', 'Chord berhasil diperbarui.');
+        return redirect()
+            ->route('songs.show', $song)
+            ->with('success', 'Chord berhasil diperbarui.');
     }
 
-    public function destroy(Song $song)
+    public function destroy(Song $song): RedirectResponse
     {
         $this->authorize('delete', $song);
 
@@ -99,6 +107,8 @@ class SongController extends Controller
 
         $song->delete();
 
-        return redirect()->route('profile')->with('success', 'Chord berhasil dihapus.');
+        return redirect()
+            ->route('profile')
+            ->with('success', 'Chord berhasil dihapus.');
     }
 }
