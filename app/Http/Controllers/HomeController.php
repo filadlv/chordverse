@@ -10,7 +10,10 @@ class HomeController extends Controller
 {
     public function index(): View
     {
-        $genres = Genre::orderByDesc('is_featured')->orderBy('name')->get();
+        $genres = Genre::withCount('songs')
+            ->orderByDesc('is_featured')
+            ->orderBy('name')
+            ->get();
 
         $popularSongs = Song::with(['genre', 'user'])
             ->orderByDesc('views')
@@ -18,6 +21,19 @@ class HomeController extends Controller
             ->take(8)
             ->get();
 
-        return view('home', compact('genres', 'popularSongs'));
+        $bookmarkedIds = $this->bookmarkedSongIds();
+
+        return view('home.index', compact('genres', 'popularSongs', 'bookmarkedIds'));
+    }
+
+    private function bookmarkedSongIds(): array
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return [];
+        }
+
+        return $user->bookmarks()->pluck('songs.id')->all();
     }
 }

@@ -12,15 +12,16 @@ class GenreController extends Controller
     {
         $query = $genre->songs()->with(['user', 'genre']);
 
-        if ($request->filled('q')) {
-            $keyword = trim($request->string('q'));
+        $keyword = trim((string) $request->query('q', ''));
+
+        if ($keyword !== '') {
             $query->where(function ($q) use ($keyword) {
                 $q->where('title', 'like', "%{$keyword}%")
                   ->orWhere('artist', 'like', "%{$keyword}%");
             });
         }
 
-        $sort = $request->string('sort', 'terbaru');
+        $sort = $request->query('sort', 'terbaru') === 'terpopuler' ? 'terpopuler' : 'terbaru';
 
         if ($sort === 'terpopuler') {
             $query->orderByDesc('views')->latest();
@@ -30,6 +31,19 @@ class GenreController extends Controller
 
         $songs = $query->paginate(12)->withQueryString();
 
-        return view('genres.show', compact('genre', 'songs'));
+        $bookmarkedIds = $this->bookmarkedSongIds();
+
+        return view('genres.show', compact('genre', 'songs', 'bookmarkedIds', 'keyword'));
+    }
+
+    private function bookmarkedSongIds(): array
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return [];
+        }
+
+        return $user->bookmarks()->pluck('songs.id')->all();
     }
 }
