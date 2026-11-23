@@ -23,7 +23,7 @@ class HomeController extends Controller
 
         $bookmarkedIds = $this->bookmarkedSongIds();
 
-        return view('home.index', compact('genres', 'popularSongs', 'bookmarkedIds'));
+        return view('home', compact('genres', 'popularSongs', 'bookmarkedIds'));
     }
 
     private function bookmarkedSongIds(): array
