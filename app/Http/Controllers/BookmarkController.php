@@ -4,21 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Song;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class BookmarkController extends Controller
 {
-    public function toggle(Song $song): RedirectResponse
+    /**
+     * Simpan atau batalkan bookmark lagu untuk pengguna yang sedang login.
+     */
+    public function toggle(Request $request, Song $song): RedirectResponse
     {
-        $user = auth()->user();
+        $user = $request->user();
 
-        if ($user->bookmarks()->whereKey($song->id)->exists()) {
-            $user->bookmarks()->detach($song->id);
-            $message = 'Bookmark dihapus.';
-        } else {
-            $user->bookmarks()->attach($song->id);
-            $message = 'Lagu ditambahkan ke bookmark.';
+        $removed = $user->bookmarks()->detach($song->id);
+
+        if ($removed > 0) {
+            return back()->with('success', 'Bookmark dihapus.');
         }
 
-        return back()->with('success', $message);
+        $user->bookmarks()->attach($song->id);
+
+        return back()->with('success', 'Lagu ditambahkan ke bookmark.');
     }
 }

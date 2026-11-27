@@ -3,17 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
-use App\Models\Song;
-use Illuminate\Http\Request;
+use App\Http\Requests\UpdatePasswordRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
     public function index(): View
     {
-        $user = auth()->user()->load('songs.genre');
+        $user = auth()->user();
 
         $songs = $user->songs()->with('genre')->latest()->paginate(8, ['*'], 'songs_page');
 
@@ -21,25 +21,36 @@ class ProfileController extends Controller
             8, ['*'], 'bookmarks_page'
         );
 
-        return view('profile.index', compact('user', 'songs', 'bookmarks'));
+        $tab = in_array(request('tab'), ['songs', 'bookmarks', 'settings'], true)
+            ? request('tab')
+            : 'songs';
+
+        return view('profile.index', compact('user', 'songs', 'bookmarks', 'tab'));
     }
 
-    public function update(ProfileUpdateRequest $request)
+    public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->update($request->validated());
+        $user = $request->user();
+
+        $data = $request->safe()->only(['name', 'email']);
+
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+
+            $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        $user->update($data);
 
         return back()->with('success', 'Profil berhasil diperbarui.');
     }
 
-    public function updatePassword(Request $request)
+    public function updatePassword(UpdatePasswordRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'confirmed', Password::min(8)],
-        ]);
-
         $request->user()->update([
-            'password' => Hash::make($validated['password']),
+            'password' => Hash::make($request->validated('password')),
         ]);
 
         return back()->with('success', 'Password berhasil diperbarui.');
