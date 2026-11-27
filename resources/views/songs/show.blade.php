@@ -22,7 +22,7 @@
             </div>
 
             <div class="cv-song-actions">
-                <button type="button" class="btn btn-primary d-inline-flex align-items-center gap-2"
+                <button type="button" class="btn btn-primary"
                         id="copyBtn" onclick="copyChord()">
                     <x-icon name="copy" /><span data-copy-label>Copy Chord</span>
                 </button>
@@ -31,18 +31,18 @@
                     @php $isSaved = $song->isBookmarkedBy(auth()->user()); @endphp
                     <form method="POST" action="{{ route('bookmarks.toggle', $song) }}">
                         @csrf
-                        <button type="submit" class="btn {{ $isSaved ? 'btn-primary' : 'btn-light' }} d-inline-flex align-items-center gap-2">
+                        <button type="submit" class="btn {{ $isSaved ? 'btn-primary' : 'btn-light' }}">
                             <x-icon name="bookmark" />{{ $isSaved ? 'Tersimpan' : 'Bookmark' }}
                         </button>
                     </form>
                 @else
-                    <a class="btn btn-light d-inline-flex align-items-center gap-2" href="{{ route('login') }}">
+                    <a class="btn btn-light" href="{{ route('login') }}">
                         <x-icon name="bookmark" /> Bookmark
                     </a>
                 @endauth
 
                 @can('update', $song)
-                    <a class="btn btn-light d-inline-flex align-items-center gap-2" href="{{ route('songs.edit', $song) }}">
+                    <a class="btn btn-light" href="{{ route('songs.edit', $song) }}">
                         <x-icon name="pencil" /> Edit
                     </a>
                 @endcan
@@ -51,7 +51,7 @@
                     <form method="POST" action="{{ route('songs.destroy', $song) }}" onsubmit="return confirm('Hapus chord ini?')">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-outline-danger d-inline-flex align-items-center gap-2">
+                        <button type="submit" class="btn btn-outline-danger">
                             <x-icon name="trash" /> Hapus
                         </button>
                     </form>

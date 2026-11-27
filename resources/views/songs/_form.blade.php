@@ -41,8 +41,8 @@
 
     <div class="col-12">
         <label class="form-label" for="chord">Chord <span class="text-danger">*</span></label>
-        <textarea id="chord" class="form-control @error('chord') is-invalid @enderror" name="chord"
-                  rows="16" style="font-family: var(--cv-mono); line-height: 1.7" required>{{ old('chord', $song->chord ?? '') }}</textarea>
+        <textarea id="chord" class="form-control cv-chord-input @error('chord') is-invalid @enderror" name="chord"
+                  rows="16" required>{{ old('chord', $song->chord ?? '') }}</textarea>
         @error('chord')<div class="invalid-feedback">{{ $message }}</div>@enderror
         <div class="form-text">Spasi dan baris baru akan dipertahankan agar posisi chord tetap rapi.</div>
     </div>

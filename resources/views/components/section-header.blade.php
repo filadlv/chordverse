@@ -8,9 +8,7 @@
         @endif
     </div>
 
-    @if (isset($action) && trim((string) $action) !== '')
-        {{ $action }}
-    @elseif ($link)
+    @if ($link)
         <a href="{{ $link }}" class="cv-link-more">{{ $linkLabel }} <x-icon name="arrow-right" /></a>
     @endif
 </div>

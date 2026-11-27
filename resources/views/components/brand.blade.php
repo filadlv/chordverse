@@ -1,6 +1,4 @@
-@props(['href' => null])
-
-<a href="{{ $href ?? route('home') }}" class="cv-brand" aria-label="ChordVerse — beranda">
+<a href="{{ route('home') }}" class="cv-brand" aria-label="ChordVerse — beranda">
     <span class="cv-brand__mark" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
              stroke-linecap="round" stroke-linejoin="round" focusable="false">

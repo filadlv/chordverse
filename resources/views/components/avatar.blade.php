@@ -1,7 +1,7 @@
 @props(['user' => null, 'size' => 'md', 'ring' => false])
 
 @php
-    $sizes = ['xs' => 28, 'sm' => 34, 'md' => 48, 'lg' => 76, 'xl' => 92];
+    $sizes = ['sm' => 34, 'md' => 48, 'xl' => 92];
     $px = $sizes[$size] ?? $sizes['md'];
     $src = $user?->avatar_url ?? asset('images/default-avatar.svg');
     $name = $user?->name ?? 'Pengguna';

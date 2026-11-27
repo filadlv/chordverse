@@ -111,14 +111,6 @@ p {
     height: 16px;
 }
 
-.cv-divider {
-    height: 1px;
-    background: var(--cv-line);
-    border: 0;
-    opacity: 1;
-    margin: 1.25rem 0;
-}
-
 /* ---------- 3. Tombol ---------- */
 .btn {
     --bs-btn-font-weight: 700;
@@ -1221,6 +1213,12 @@ p {
     margin: 1.25rem 0 1rem;
 }
 
+.cv-song-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 .cv-chord-toolbar {
     display: flex;
     align-items: center;
@@ -1439,23 +1437,9 @@ p {
     box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
 }
 
-.cv-form-hint {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.45rem;
-    font-size: 0.79rem;
-    color: var(--cv-muted);
-    background: #f8f7ff;
-    border: 1px solid var(--cv-line);
-    border-radius: 12px;
-    padding: 0.6rem 0.75rem;
-}
-
-.cv-form-hint svg {
-    width: 15px;
-    height: 15px;
-    margin-top: 1px;
-    color: var(--cv-primary-600);
+.cv-chord-input {
+    font-family: var(--cv-mono);
+    line-height: 1.7;
 }
 
 .cv-pw {
@@ -1886,10 +1870,8 @@ p {
     flex: 0 0 auto;
 }
 
-.cv-avatar--xs { width: 28px; height: 28px; }
 .cv-avatar--sm { width: 34px; height: 34px; }
 .cv-avatar--md { width: 48px; height: 48px; }
-.cv-avatar--lg { width: 76px; height: 76px; }
 .cv-avatar--xl { width: 92px; height: 92px; }
 
 .cv-avatar--ring {
@@ -1941,29 +1923,6 @@ p {
 .cv-sticky-sidebar {
     position: sticky;
     top: calc(var(--cv-header-h) + 1rem);
-}
-
-.cv-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
-.cv-search-inline {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.cv-search-inline .form-control {
-    min-width: 190px;
-}
-
-.cv-scroll-x {
-    overflow-x: auto;
-    scrollbar-width: thin;
 }
 
 /* ---------- 17. Responsive ---------- */
@@ -2188,6 +2147,11 @@ p {
     .cv-song-actions .btn {
         flex: 1 1 auto;
     }
+}
+
+/* Utilitas: cegah teks panjang meluber dari flex item */
+.min-w-0 {
+    min-width: 0;
 }
 
 /* ---------- 18. Aksesibilitas & cetak ---------- */
