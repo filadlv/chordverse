@@ -1,45 +1,113 @@
 @extends('layouts.app')
+
+@section('title', $song->title.' — '.$song->artist.' | ChordVerse')
+@section('description', 'Chord dan lirik lagu '.$song->title.' oleh '.$song->artist.' di ChordVerse.')
+
 @section('content')
-<div class="mb-3"><a href="{{ url()->previous() }}" class="text-decoration-none">← Kembali</a></div>
-<div class="row g-4">
-<div class="col-lg-4">
-<img class="cover mb-3" src="{{ $song->cover_url }}" alt="{{ $song->title }}">
-<div class="card border-0 shadow-sm rounded-4 p-3">
-<div class="d-flex justify-content-between">
-<div><small class="muted">Genre</small><div><a href="{{ route('genres.show',$song->genre) }}">{{ $song->genre->name }}</a></div></div>
-<div class="text-end"><small class="muted">Dilihat</small><div>👁 {{ number_format($song->views) }}</div></div>
-</div>
-<hr>
-<div><small class="muted">Pembuat Chord</small><div class="fw-semibold">{{ $song->user->name }}</div><small class="muted">{{ $song->created_at->format('d M Y') }}</small></div>
-</div>
-</div>
-<div class="col-lg-8">
-<div class="d-flex justify-content-between align-items-start gap-3">
-<div><span class="badge text-bg-light mb-2">{{ $song->genre->name }}</span><h1 class="display-6 fw-bold mb-1">{{ $song->title }}</h1><p class="lead muted">{{ $song->artist }}</p></div>
-@auth
-<form method="POST" action="{{ route('bookmarks.toggle',$song) }}">
-@csrf
-<button class="btn btn-outline-primary">{{ $song->isBookmarkedBy(auth()->user()) ? '★ Tersimpan' : '☆ Bookmark' }}</button>
-</form>
-@else
-<a class="btn btn-outline-primary" href="{{ route('login') }}">☆ Bookmark</a>
-@endauth
-</div>
+    <div class="mb-2">
+        <a class="cv-back" href="{{ url()->previous() }}">
+            <x-icon name="arrow-left" /> Kembali
+        </a>
+    </div>
 
-<div class="d-flex gap-2 mb-3">
-<button class="btn btn-dark" id="copyBtn" onclick="copyChord()">Copy Chord</button>
-@can('update', $song)<a class="btn btn-outline-secondary" href="{{ route('songs.edit',$song) }}">Edit</a>@endcan
-@can('delete', $song)
-<form method="POST" action="{{ route('songs.destroy',$song) }}" onsubmit="return confirm('Hapus chord ini?')">
-@csrf @method('DELETE') <button class="btn btn-outline-danger">Hapus</button>
-</form>
-@endcan
-</div>
+    <div class="row g-4 g-lg-5">
+        <div class="col-lg-8 order-lg-1">
+            <div class="cv-song-head">
+                <img class="cv-song-head__thumb d-lg-none" src="{{ $song->cover_url }}" alt="Cover {{ $song->title }}">
+                <div class="min-w-0">
+                    <span class="cv-badge"><x-icon name="music" />{{ $song->genre->name }}</span>
+                    <h1 class="cv-song-title">{{ $song->title }}</h1>
+                    <p class="cv-song-artist">{{ $song->artist }}</p>
+                </div>
+            </div>
 
-<div id="chordText" class="chord-box">{{ $song->chord }}</div>
-@if($song->notes)
-<div class="card border-0 bg-light rounded-4 p-3 mt-3"><strong>Catatan</strong><div class="mt-1">{{ $song->notes }}</div></div>
-@endif
-</div>
-</div>
+            <div class="cv-song-actions">
+                <button type="button" class="btn btn-primary"
+                        id="copyBtn" onclick="copyChord()">
+                    <x-icon name="copy" /><span data-copy-label>Copy Chord</span>
+                </button>
+
+                @auth
+                    @php $isSaved = $song->isBookmarkedBy(auth()->user()); @endphp
+                    <form method="POST" action="{{ route('bookmarks.toggle', $song) }}">
+                        @csrf
+                        <button type="submit" class="btn {{ $isSaved ? 'btn-primary' : 'btn-light' }}">
+                            <x-icon name="bookmark" />{{ $isSaved ? 'Tersimpan' : 'Bookmark' }}
+                        </button>
+                    </form>
+                @else
+                    <a class="btn btn-light" href="{{ route('login') }}">
+                        <x-icon name="bookmark" /> Bookmark
+                    </a>
+                @endauth
+
+                @can('update', $song)
+                    <a class="btn btn-light" href="{{ route('songs.edit', $song) }}">
+                        <x-icon name="pencil" /> Edit
+                    </a>
+                @endcan
+
+                @can('delete', $song)
+                    <form method="POST" action="{{ route('songs.destroy', $song) }}" onsubmit="return confirm('Hapus chord ini?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-outline-danger">
+                            <x-icon name="trash" /> Hapus
+                        </button>
+                    </form>
+                @endcan
+            </div>
+
+            <div class="cv-chord-toolbar">
+                <span class="cv-chord-toolbar__hint">
+                    <x-icon name="info" /> Geser ke samping bila baris chord terlalu panjang.
+                </span>
+                <span class="cv-chord-toolbar__hint">
+                    <x-icon name="eye" /> {{ number_format($song->views) }} kali dilihat
+                </span>
+            </div>
+
+            <div id="chordText" class="cv-chord">{{ $song->chord }}</div>
+
+            @if ($song->notes)
+                <div class="cv-notes">
+                    <div class="cv-notes__title"><x-icon name="info" /> Catatan</div>
+                    <p>{{ $song->notes }}</p>
+                </div>
+            @endif
+        </div>
+
+        <div class="col-lg-4 order-lg-2 cv-sidebar">
+            <div class="cv-sticky-sidebar">
+                <div class="cv-cover-frame d-none d-lg-block">
+                    <img src="{{ $song->cover_url }}" alt="Cover {{ $song->title }}">
+                </div>
+
+                <div class="cv-panel cv-panel--tight cv-info-card">
+                    <div class="cv-info-row">
+                        <span class="cv-info-row__label"><x-icon name="music" /> Genre</span>
+                        <span class="cv-info-row__value">
+                            <a href="{{ route('genres.show', $song->genre) }}">{{ $song->genre->name }}</a>
+                        </span>
+                    </div>
+                    <div class="cv-info-row">
+                        <span class="cv-info-row__label"><x-icon name="eye" /> Dilihat</span>
+                        <span class="cv-info-row__value">{{ number_format($song->views) }}</span>
+                    </div>
+                    <div class="cv-info-row">
+                        <span class="cv-info-row__label"><x-icon name="clock" /> Ditambahkan</span>
+                        <span class="cv-info-row__value">{{ $song->created_at->format('d M Y') }}</span>
+                    </div>
+
+                    <div class="cv-author">
+                        <x-avatar :user="$song->user" size="sm" />
+                        <div>
+                            <div class="cv-author__name">{{ $song->user->name ?? 'Pengguna' }}</div>
+                            <div class="cv-author__meta">Pembuat chord</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection

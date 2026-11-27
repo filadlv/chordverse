@@ -1,0 +1,10 @@
+/*
+ |--------------------------------------------------------------------------
+ | ChordVerse — resources/css/app.css
+ |--------------------------------------------------------------------------
+ | Sumber gaya utama berada di public/css/chordverse.css supaya tampilan
+ | tetap berjalan tanpa langkah build Vite (cukup php artisan serve /
+ | Laragon). File ini menyatukannya ke pipeline Vite bila nanti dipakai.
+ */
+
+@import "../../public/css/chordverse.css";
